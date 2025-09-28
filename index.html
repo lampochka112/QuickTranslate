@@ -32,11 +32,47 @@
   h1 {
     text-align: center;
     font-size: 3em;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     color: #222;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
   }
 
+  /* Вкладки */
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 14px;
+    cursor: pointer;
+    background-color: #2196F3;
+    color: #fff;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0;
+    transition: background-color 0.3s;
+  }
+
+  .tab:hover {
+    background-color: #0b7dda;
+  }
+
+  .tab.active {
+    background-color: #0b7dda;
+  }
+
+  /* Секции */
+  .section {
+    display: none;
+  }
+
+  .section.active {
+    display: block;
+  }
+
+  /* Остальные стили остаются без изменений */
   .selectors {
     display: flex;
     justify-content: space-between;
@@ -182,77 +218,89 @@
 <div class="container">
   <h1>QuickTranslate Extended</h1>
   
-  <!-- Настройки -->
-  <div class="selectors">
-    <div class="selector-group">
-      <label for="sourceLang">Язык оригинала:</label>
-      <select id="sourceLang">
-        <option value="auto">Автоопределение</option>
-        <option value="en">Английский</option>
-        <option value="ru">Русский</option>
-      </select>
+  <!-- Вкладки -->
+  <div class="tabs">
+    <div class="tab active" data-tab="translateSection">Перевод</div>
+    <div class="tab" data-tab="testSection">Тест</div>
+  </div>
+
+  <!-- Раздел "Перевод" -->
+  <div id="translateSection" class="section active">
+    <!-- Настройки -->
+    <div class="selectors">
+      <div class="selector-group">
+        <label for="sourceLang">Язык оригинала:</label>
+        <select id="sourceLang">
+          <option value="auto">Автоопределение</option>
+          <option value="en">Английский</option>
+          <option value="ru">Русский</option>
+        </select>
+      </div>
+      <div class="selector-group">
+        <label for="targetLang">Язык перевода:</label>
+        <select id="targetLang">
+          <option value="ru">Русский</option>
+          <option value="en">Английский</option>
+        </select>
+      </div>
     </div>
-    <div class="selector-group">
-      <label for="targetLang">Язык перевода:</label>
-      <select id="targetLang">
-        <option value="ru">Русский</option>
-        <option value="en">Английский</option>
-      </select>
+
+    <!-- Ввод текста -->
+    <div>
+      <label for="inputText">Введите текст:</label>
+      <input id="inputText" class="awesomplete" placeholder="Введите текст для перевода..." />
+    </div>
+
+    <!-- Кнопки -->
+    <div class="buttons">
+      <button id="translateBtn">Перевести</button>
+      <button id="swapBtn">Поменять языки</button>
+      <button id="clearDictBtn">Очистить словарь</button>
+      <button id="startTestBtn">Начать тест</button> <!-- Можно оставить тут для быстрого доступа -->
+    </div>
+
+    <!-- Вывод -->
+    <div>
+      <label for="outputText">Перевод:</label>
+      <textarea id="outputText" readonly></textarea>
+    </div>
+
+    <!-- Добавление слова -->
+    <div class="extra">
+      <h3>Добавить слово в словарь</h3>
+      <input type="text" id="newWord" placeholder="Слово" />
+      <input type="text" id="newTranslation" placeholder="Перевод" />
+      <button id="addWordBtn">Добавить</button>
+    </div>
+
+    <!-- Импорт/Экспорт -->
+    <div class="io-section">
+      <button id="exportDict">Экспорт словаря</button>
+      <input type="file" id="importFile" style="display:none" />
+      <button id="importDict">Импорт словаря</button>
+    </div>
+
+    <!-- Словарь -->
+    <div id="dictionary">
+      <h3>Ваш словарь:</h3>
+      <div id="dictEntries"></div>
     </div>
   </div>
 
-  <!-- Ввод текста -->
-  <div>
-    <label for="inputText">Введите текст:</label>
-    <input id="inputText" class="awesomplete" placeholder="Введите текст для перевода..." />
-  </div>
-
-  <!-- Кнопки -->
-  <div class="buttons">
-    <button id="translateBtn">Перевести</button>
-    <button id="swapBtn">Поменять языки</button>
-    <button id="clearDictBtn">Очистить словарь</button>
-    <button id="startTestBtn">Начать тест</button>
-  </div>
-
-  <!-- Вывод -->
-  <div>
-    <label for="outputText">Перевод:</label>
-    <textarea id="outputText" readonly></textarea>
-  </div>
-
-  <!-- Добавление слова -->
-  <div class="extra">
-    <h3>Добавить слово в словарь</h3>
-    <input type="text" id="newWord" placeholder="Слово" />
-    <input type="text" id="newTranslation" placeholder="Перевод" />
-    <button id="addWordBtn">Добавить</button>
-  </div>
-
-  <!-- Импорт/Экспорт -->
-  <div class="io-section">
-    <button id="exportDict">Экспорт словаря</button>
-    <input type="file" id="importFile" style="display:none" />
-    <button id="importDict">Импорт словаря</button>
-  </div>
-
-  <!-- Словарь -->
-  <div id="dictionary">
-    <h3>Ваш словарь:</h3>
-    <div id="dictEntries"></div>
-  </div>
-
-  <!-- Тестовая секция -->
-  <div class="test-section" id="testSection" style="display:none;">
-    <div class="test-question" id="testQuestion"></div>
-    <input type="text" id="testAnswer" placeholder="Ваш ответ" />
-    <button id="submitAnswer">Ответить</button>
-    <div id="testResult"></div>
+  <!-- Раздел "Тест" -->
+  <div id="testSection" class="section">
+    <button id="startTestBtnMain" style="margin-bottom: 20px;">Начать тест</button>
+    <div class="test-section" id="testInnerSection" style="display:none;">
+      <div class="test-question" id="testQuestion"></div>
+      <input type="text" id="testAnswer" placeholder="Ваш ответ" />
+      <button id="submitAnswer">Ответить</button>
+      <div id="testResult"></div>
+    </div>
   </div>
 </div>
 
 <script>
-  // Расширенный словарь
+  // Изначальный словарь (оставляем без изменений)
   let dictionary = {
     "hello": "привет",
     "world": "мир",
@@ -314,6 +362,7 @@
     "airport": "аэропорт"
   };
 
+  // Загрузка и сохранение словаря
   function loadDictionary() {
     const stored = localStorage.getItem('quicktranslate_ext_dict');
     if (stored) {
@@ -325,7 +374,6 @@
   function saveDictionary() {
     localStorage.setItem('quicktranslate_ext_dict', JSON.stringify(dictionary));
   }
-
   function displayDictionary() {
     const div = document.getElementById('dictEntries');
     div.innerHTML = '';
@@ -456,7 +504,7 @@ document.getElementById('clearDictBtn').onclick = () => {
   }
 };
 
-// Тест
+// Тестовая логика
 const testQuestions = [
   { en: 'apple', ru: 'яблоко' },
   { en: 'book', ru: 'книга' },
@@ -468,7 +516,7 @@ const testQuestions = [
 let currentTestIndex = 0;
 
 function startTest() {
-  document.getElementById('testSection').style.display = 'block';
+  document.getElementById('testInnerSection').style.display = 'block';
   currentTestIndex = 0;
   showQuestion();
 }
@@ -491,7 +539,7 @@ document.getElementById('submitAnswer').onclick = () => {
     currentTestIndex++;
     if (currentTestIndex >= testQuestions.length) {
       alert('Тест пройден! Можно начать заново.');
-      document.getElementById('testSection').style.display = 'none';
+      document.getElementById('testInnerSection').style.display = 'none';
     } else {
       showQuestion();
     }
@@ -500,7 +548,7 @@ document.getElementById('submitAnswer').onclick = () => {
   }
 };
 
-document.getElementById('startTestBtn').onclick = () => {
+document.getElementById('startTestBtnMain').onclick = () => {
   startTest();
 };
 
@@ -508,6 +556,30 @@ document.getElementById('startTestBtn').onclick = () => {
 loadDictionary();
 displayDictionary();
 updateAutocomplete();
+
+// Вкладки
+const tabs = document.querySelectorAll('.tab');
+const sections = document.querySelectorAll('.section');
+
+tabs.forEach(tab => {
+  tab.onclick = () => {
+    // Убрать активность у всех вкладок
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    // Скрыть все секции
+    sections.forEach(sec => sec.classList.remove('active'));
+
+    // Показать выбранную
+    const selected = tab.dataset.tab;
+    document.getElementById(selected).classList.add('active');
+
+    // Если выбрана вкладка "Тест", можно автоматически начать тест или оставить по кнопке
+    if (selected === 'testSection') {
+      document.getElementById('testInnerSection').style.display = 'none';
+    }
+  };
+});
 </script>
 </body>
 </html>
