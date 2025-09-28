@@ -411,20 +411,19 @@
     return 'en';
   }
 
-  // Перевод слова
-function translateWord(word, langFrom, langTo) {
-  if (langFrom === 'en' && langTo === 'ru') {
-    return dictionary[word.toLowerCase()] || 'Перевод не найден';
-  } else if (langFrom === 'ru' && langTo === 'en') {
-    for (const [k, v] of Object.entries(dictionary)) {
-      if (v === word.toLowerCase()) return k;
+  function translateWord(word, langFrom, langTo) {
+    if (langFrom === 'en' && langTo === 'ru') {
+      return dictionary[word.toLowerCase()] || 'Перевод не найден';
+    } else if (langFrom === 'ru' && langTo === 'en') {
+      for (const [k, v] of Object.entries(dictionary)) {
+        if (v === word.toLowerCase()) return k;
+      }
+      return 'Перевод не найден';
     }
-    return 'Перевод не найден';
+    return 'Поддерживаются только английский и русский.';
   }
-  return 'Поддерживаются только английский и русский.';
-}
 
-// Перевод текста
+  // Перевод текста
 document.getElementById('translateBtn').onclick = () => {
   let text = document.getElementById('inputText').value.trim();
   let selectedLang = document.getElementById('sourceLang').value;
@@ -514,8 +513,11 @@ const testQuestions = [
 ];
 
 let currentTestIndex = 0;
+let score = 0;
+const totalQuestions = testQuestions.length;
 
 function startTest() {
+  score = 0; // сброс очков
   document.getElementById('testInnerSection').style.display = 'block';
   currentTestIndex = 0;
   showQuestion();
@@ -535,27 +537,26 @@ document.getElementById('submitAnswer').onclick = () => {
   const answer = document.getElementById('testAnswer').value.trim().toLowerCase();
   const correct = document.getElementById('testAnswer').dataset.correct;
   if (answer === correct) {
-    document.getElementById('testResult').textContent = 'Правильно!';
-    currentTestIndex++;
-    if (currentTestIndex >= testQuestions.length) {
-      alert('Тест пройден! Можно начать заново.');
-      document.getElementById('testInnerSection').style.display = 'none';
-    } else {
-      showQuestion();
-    }
+    score++;
+    document.getElementById('testResult').textContent = `Правильно! Очки: ${score}/${totalQuestions}`;
   } else {
-    document.getElementById('testResult').textContent = 'Неправильно, попробуйте снова.';
+    document.getElementById('testResult').textContent = `Неправильно, попробуйте снова. Текущий счет: ${score}/${totalQuestions}`;
+    return; // чтобы пользователь мог попробовать еще раз, не переходя к следующему вопрос
+  }
+
+  currentTestIndex++;
+  if (currentTestIndex >= testQuestions.length) {
+    alert(`Тест завершен! Ваш результат: ${score} из ${totalQuestions}`);
+    // Можно оставить счет или сбросить
+    document.getElementById('testInnerSection').style.display = 'none';
+  } else {
+    showQuestion();
   }
 };
 
 document.getElementById('startTestBtnMain').onclick = () => {
   startTest();
 };
-
-// Изначально грузим словарь
-loadDictionary();
-displayDictionary();
-updateAutocomplete();
 
 // Вкладки
 const tabs = document.querySelectorAll('.tab');
