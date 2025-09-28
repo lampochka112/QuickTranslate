@@ -541,10 +541,20 @@ let currentTestQuestions = [];
 let currentTestIndex = 0;
 let score = 0;
 
+// Вспомогательная функция для перемешивания массива
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function startTest() {
   score = 0; // сброс очков
   const level = document.getElementById('difficultyLevel').value;
-  currentTestQuestions = testQuestions[level] || testQuestions['easy'];
+  currentTestQuestions = [...(testQuestions[level] || testQuestions['easy'])]; // копия
+  shuffleArray(currentTestQuestions); // перемешиваем
   currentTestIndex = 0;
   document.getElementById('testInnerSection').style.display = 'block';
   showQuestion();
