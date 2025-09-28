@@ -256,7 +256,7 @@
       <button id="translateBtn">Перевести</button>
       <button id="swapBtn">Поменять языки</button>
       <button id="clearDictBtn">Очистить словарь</button>
-      <button id="startTestBtn">Начать тест</button> <!-- Можно оставить тут для быстрого доступа -->
+      <button id="startTestBtn">Начать тест</button>
     </div>
 
     <!-- Вывод -->
@@ -290,6 +290,15 @@
   <!-- Раздел "Тест" -->
   <div id="testSection" class="section">
     <button id="startTestBtnMain" style="margin-bottom: 20px;">Начать тест</button>
+    <!-- Добавляем селектор уровня сложности -->
+    <div style="margin-bottom: 15px;">
+      <label for="difficultyLevel">Уровень сложности:</label>
+      <select id="difficultyLevel">
+        <option value="easy">Легкий</option>
+        <option value="medium">Средний</option>
+        <option value="hard">Тяжелый</option>
+      </select>
+    </div>
     <div class="test-section" id="testInnerSection" style="display:none;">
       <div class="test-question" id="testQuestion"></div>
       <input type="text" id="testAnswer" placeholder="Ваш ответ" />
@@ -300,7 +309,7 @@
 </div>
 
 <script>
-  // Изначальный словарь (оставляем без изменений)
+  // Изначальный словарь
   let dictionary = {
     "hello": "привет",
     "world": "мир",
@@ -503,28 +512,46 @@ document.getElementById('clearDictBtn').onclick = () => {
   }
 };
 
-// Тестовая логика
-const testQuestions = [
-  { en: 'apple', ru: 'яблоко' },
-  { en: 'book', ru: 'книга' },
-  { en: 'car', ru: 'машина' },
-  { en: 'love', ru: 'любовь' },
-  { en: 'water', ru: 'вода' }
-];
+// Расширенные слова для теста по уровням
+const testQuestions = {
+  easy: [
+    { en: 'apple', ru: 'яблоко' },
+    { en: 'book', ru: 'книга' },
+    { en: 'car', ru: 'машина' },
+    { en: 'love', ru: 'любовь' },
+    { en: 'water', ru: 'вода' }
+  ],
+  medium: [
+    { en: 'computer', ru: 'компьютер' },
+    { en: 'mountain', ru: 'гора' },
+    { en: 'city', ru: 'город' },
+    { en: 'family', ru: 'семья' },
+    { en: 'holiday', ru: 'отдых' }
+  ],
+  hard: [
+    { en: 'psychology', ru: 'психология' },
+    { en: 'architecture', ru: 'архитектура' },
+    { en: 'philosophy', ru: 'философия' },
+    { en: 'environment', ru: 'окружающая среда' },
+    { en: 'entrepreneur', ru: 'предприниматель' }
+  ]
+};
 
+let currentTestQuestions = [];
 let currentTestIndex = 0;
 let score = 0;
-const totalQuestions = testQuestions.length;
 
 function startTest() {
   score = 0; // сброс очков
-  document.getElementById('testInnerSection').style.display = 'block';
+  const level = document.getElementById('difficultyLevel').value;
+  currentTestQuestions = testQuestions[level] || testQuestions['easy'];
   currentTestIndex = 0;
+  document.getElementById('testInnerSection').style.display = 'block';
   showQuestion();
 }
 
 function showQuestion() {
-  const q = testQuestions[currentTestIndex];
+  const q = currentTestQuestions[currentTestIndex];
   const isEn = Math.random() > 0.5;
   const word = isEn ? q.en : q.ru;
   document.getElementById('testQuestion').textContent = `Переведите слово: ${word}`;
@@ -538,16 +565,15 @@ document.getElementById('submitAnswer').onclick = () => {
   const correct = document.getElementById('testAnswer').dataset.correct;
   if (answer === correct) {
     score++;
-    document.getElementById('testResult').textContent = `Правильно! Очки: ${score}/${totalQuestions}`;
+    document.getElementById('testResult').textContent = `Правильно! Очки: ${score}/${currentTestQuestions.length}`;
   } else {
-    document.getElementById('testResult').textContent = `Неправильно, попробуйте снова. Текущий счет: ${score}/${totalQuestions}`;
-    return; // чтобы пользователь мог попробовать еще раз, не переходя к следующему вопрос
+    document.getElementById('testResult').textContent = `Неправильно, попробуйте снова. Текущий счет: ${score}/${currentTestQuestions.length}`;
+    return;
   }
 
   currentTestIndex++;
-  if (currentTestIndex >= testQuestions.length) {
-    alert(`Тест завершен! Ваш результат: ${score} из ${totalQuestions}`);
-    // Можно оставить счет или сбросить
+  if (currentTestIndex >= currentTestQuestions.length) {
+    alert(`Тест завершен! Ваш результат: ${score} из ${currentTestQuestions.length}`);
     document.getElementById('testInnerSection').style.display = 'none';
   } else {
     showQuestion();
@@ -564,18 +590,13 @@ const sections = document.querySelectorAll('.section');
 
 tabs.forEach(tab => {
   tab.onclick = () => {
-    // Убрать активность у всех вкладок
     tabs.forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
 
-    // Скрыть все секции
     sections.forEach(sec => sec.classList.remove('active'));
-
-    // Показать выбранную
     const selected = tab.dataset.tab;
     document.getElementById(selected).classList.add('active');
 
-    // Если выбрана вкладка "Тест", можно автоматически начать тест или оставить по кнопке
     if (selected === 'testSection') {
       document.getElementById('testInnerSection').style.display = 'none';
     }
