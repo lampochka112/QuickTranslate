@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QuickTranslate Extended</title>
+<!-- Подключение стилей и автодополнения -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/awesomplete/awesomplete.css" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  .container {
+    background: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    max-width: 1200px;
+    width: 100%;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 3em;
+    margin-bottom: 30px;
+    color: #222;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+  }
+
+  .selectors {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+  }
+
+  .selector-group {
+    flex: 1 1 45%;
+    margin-bottom: 10px;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  select, input[type=text], textarea {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    transition: box-shadow 0.3s;
+  }
+
+  select:focus, input[type=text]:focus, textarea:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(102, 166, 255, 0.6);
+  }
+
+  textarea {
+    height: 180px;
+    resize: vertical;
+    margin-top: 10px;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  button {
+    padding: 14px 25px;
+    font-size: 1em;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: background-color 0.3s, transform 0.2s;
+  }
+
+  button:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+  }
+
+  /* Дополнительные стили */
+  .extra {
+    margin-top: 30px;
+  }
+
+  #dictionary {
+    background: #fafafa;
+    margin-top: 25px;
+    padding: 15px;
+    border-radius: 12px;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  #dictionary h3 {
+    margin-top: 0;
+  }
+
+  #dictEntries p {
+    margin: 4px 0;
+  }
+
+  /* Импорт/экспорт секция */
+  .io-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+  }
+
+  .io-section button {
+    width: 48%;
+    padding: 14px;
+    border-radius: 12px;
+    background-color: #2196F3;
+  }
+
+  .io-section button:hover {
+    background-color: #0b7dda;
+  }
+
+  /* Тестовая секция */
+  .test-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #e0f2f1;
+    border-radius: 12px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .test-question {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+
+  /* Для кнопки запуска теста */
+  #startTestBtn {
+    display: block;
+    margin: 20px auto;
+    padding: 14px 25px;
+    font-size: 1em;
+    border: none;
+    border-radius: 12px;
+    background-color: #ff5722;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: background-color 0.3s;
+  }
+
+  #startTestBtn:hover {
+    background-color: #e64a19;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/awesomplete/awesomplete.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>QuickTranslate Extended</h1>
+  
+  <!-- Настройки -->
+  <div class="selectors">
+    <div class="selector-group">
+      <label for="sourceLang">Язык оригинала:</label>
+      <select id="sourceLang">
+        <option value="auto">Автоопределение</option>
+        <option value="en">Английский</option>
+        <option value="ru">Русский</option>
+      </select>
+    </div>
+    <div class="selector-group">
+      <label for="targetLang">Язык перевода:</label>
+      <select id="targetLang">
+        <option value="ru">Русский</option>
+        <option value="en">Английский</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Ввод текста -->
+  <div>
+    <label for="inputText">Введите текст:</label>
+    <input id="inputText" class="awesomplete" placeholder="Введите текст для перевода..." />
+  </div>
+
+  <!-- Кнопки -->
+  <div class="buttons">
+    <button id="translateBtn">Перевести</button>
+    <button id="swapBtn">Поменять языки</button>
+    <button id="clearDictBtn">Очистить словарь</button>
+    <button id="startTestBtn">Начать тест</button>
+  </div>
+
+  <!-- Вывод -->
+  <div>
+    <label for="outputText">Перевод:</label>
+    <textarea id="outputText" readonly></textarea>
+  </div>
+
+  <!-- Добавление слова -->
+  <div class="extra">
+    <h3>Добавить слово в словарь</h3>
+    <input type="text" id="newWord" placeholder="Слово" />
+    <input type="text" id="newTranslation" placeholder="Перевод" />
+    <button id="addWordBtn">Добавить</button>
+  </div>
+
+  <!-- Импорт/Экспорт -->
+  <div class="io-section">
+    <button id="exportDict">Экспорт словаря</button>
+    <input type="file" id="importFile" style="display:none" />
+    <button id="importDict">Импорт словаря</button>
+  </div>
+
+  <!-- Словарь -->
+  <div id="dictionary">
+    <h3>Ваш словарь:</h3>
+    <div id="dictEntries"></div>
+  </div>
+
+  <!-- Тестовая секция -->
+  <div class="test-section" id="testSection" style="display:none;">
+    <div class="test-question" id="testQuestion"></div>
+    <input type="text" id="testAnswer" placeholder="Ваш ответ" />
+    <button id="submitAnswer">Ответить</button>
+    <div id="testResult"></div>
+  </div>
+</div>
+
+<script>
+  // Расширенный словарь
+  let dictionary = {
+    "hello": "привет",
+    "world": "мир",
+    "cat": "кот",
+    "dog": "собака",
+    "thank": "спасибо",
+    "please": "пожалуйста",
+    "good": "хорошо",
+    "morning": "утро",
+    "night": "ночь",
+    "computer": "компьютер",
+    "phone": "телефон",
+    "car": "машина",
+    "food": "еда",
+    "water": "вода",
+    "book": "книга",
+    "school": "школа",
+    "city": "город",
+    "friend": "друг",
+    "family": "семья",
+    "love": "любовь",
+    "happy": "счастливый",
+    "house": "дом",
+    "tree": "дерево",
+    "river": "река",
+    "mountain": "гора",
+    "sun": "солнце",
+    "moon": "луна",
+    "star": "звезда",
+    "flower": "цветок",
+    "bread": "хлеб",
+    "music": "музыка",
+    "dance": "танец",
+    "teacher": "учитель",
+    "student": "ученик",
+    "beach": "пляж",
+    "holiday": "отдых",
+    "game": "игра",
+    "movie": "фильм",
+    "computer science": "информатика",
+    "library": "библиотека",
+    "city park": "городской парк",
+    "hotel": "отель",
+    "restaurant": "ресторан",
+    "window": "окно",
+    "door": "дверь",
+    "sunshine": "солнечный свет",
+    "rain": "дождь",
+    "snow": "снег",
+    "beautiful": "красивый",
+    "happy birthday": "с днем рождения",
+    "goodbye": "до свидания",
+    "thank you": "спасибо",
+    "excuse me": "извините",
+    "help": "помощь",
+    "welcome": "добро пожаловать",
+    "night sky": "ночное небо",
+    "train": "поезд",
+    "airport": "аэропорт"
+  };
+
+  function loadDictionary() {
+    const stored = localStorage.getItem('quicktranslate_ext_dict');
+    if (stored) {
+      try {
+        dictionary = JSON.parse(stored);
+      } catch(e) { console.error('Ошибка загрузки словаря', e); }
+    }
+  }
+  function saveDictionary() {
+    localStorage.setItem('quicktranslate_ext_dict', JSON.stringify(dictionary));
+  }
+
+  function displayDictionary() {
+    const div = document.getElementById('dictEntries');
+    div.innerHTML = '';
+    for (const [word, trans] of Object.entries(dictionary)) {
+      const p = document.createElement('p');
+      p.innerHTML = `<b>${word}</b> &rarr; ${trans} <button data-word="${word}">Удалить</button>`;
+      div.appendChild(p);
+    }
+    // Обработчик удаления
+    div.querySelectorAll('button').forEach(btn => {
+      btn.onclick = () => {
+        const w = btn.dataset.word;
+        delete dictionary[w];
+        saveDictionary();
+        displayDictionary();
+        updateAutocomplete();
+      }
+    });
+  }
+
+  const inputField = document.getElementById('inputText');
+  const awesomplete = new Awesomplete(inputField, {
+    list: Object.keys(dictionary),
+    minChars: 1,
+    maxItems: 15,
+    autoFirst: true
+  });
+  function updateAutocomplete() {
+    awesomplete.list = Object.keys(dictionary);
+  }
+
+  function detectLanguage(text) {
+    const cyrillicPattern = /[а-яё]/i;
+    if (cyrillicPattern.test(text)) return 'ru';
+    return 'en';
+  }
+
+  // Перевод слова
+function translateWord(word, langFrom, langTo) {
+  if (langFrom === 'en' && langTo === 'ru') {
+    return dictionary[word.toLowerCase()] || 'Перевод не найден';
+  } else if (langFrom === 'ru' && langTo === 'en') {
+    for (const [k, v] of Object.entries(dictionary)) {
+      if (v === word.toLowerCase()) return k;
+    }
+    return 'Перевод не найден';
+  }
+  return 'Поддерживаются только английский и русский.';
+}
+
+// Перевод текста
+document.getElementById('translateBtn').onclick = () => {
+  let text = document.getElementById('inputText').value.trim();
+  let selectedLang = document.getElementById('sourceLang').value;
+  const targetLang = document.getElementById('targetLang').value;
+  if (selectedLang === 'auto') {
+    selectedLang = detectLanguage(text);
+  }
+
+  const words = text.split(/\s+/);
+  const result = words.map(w => translateWord(w, selectedLang, targetLang));
+  document.getElementById('outputText').value = result.join(' ');
+};
+
+document.getElementById('swapBtn').onclick = () => {
+  const sel1 = document.getElementById('sourceLang');
+  const sel2 = document.getElementById('targetLang');
+  [sel1.value, sel2.value] = [sel2.value, sel1.value];
+};
+
+document.getElementById('addWordBtn').onclick = () => {
+  const word = document.getElementById('newWord').value.trim().toLowerCase();
+  const trans = document.getElementById('newTranslation').value.trim().toLowerCase();
+  if (!word || !trans) {
+    alert('Заполните оба поля!');
+    return;
+  }
+  dictionary[word] = trans;
+  saveDictionary();
+  displayDictionary();
+  updateAutocomplete();
+  document.getElementById('newWord').value = '';
+  document.getElementById('newTranslation').value = '';
+};
+
+document.getElementById('exportDict').onclick = () => {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dictionary));
+  const a = document.createElement('a');
+  a.href = dataStr;
+  a.download = 'dictionary.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
+
+document.getElementById('importDict').onclick = () => {
+  document.getElementById('importFile').click();
+};
+document.getElementById('importFile').onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const importedDict = JSON.parse(reader.result);
+      if (typeof importedDict === 'object') {
+        dictionary = importedDict;
+        saveDictionary();
+        displayDictionary();
+        updateAutocomplete();
+        alert('Словарь успешно импортирован!');
+      } else {
+        alert('Некорректный файл');
+      }
+    } catch {
+      alert('Ошибка чтения файла');
+    }
+  };
+  reader.readAsText(file);
+};
+
+document.getElementById('clearDictBtn').onclick = () => {
+  if (confirm('Вы уверены, что хотите очистить словарь?')) {
+    dictionary = {};
+    saveDictionary();
+    displayDictionary();
+    updateAutocomplete();
+  }
+};
+
+// Тест
+const testQuestions = [
+  { en: 'apple', ru: 'яблоко' },
+  { en: 'book', ru: 'книга' },
+  { en: 'car', ru: 'машина' },
+  { en: 'love', ru: 'любовь' },
+  { en: 'water', ru: 'вода' }
+];
+
+let currentTestIndex = 0;
+
+function startTest() {
+  document.getElementById('testSection').style.display = 'block';
+  currentTestIndex = 0;
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = testQuestions[currentTestIndex];
+  const isEn = Math.random() > 0.5;
+  const word = isEn ? q.en : q.ru;
+  document.getElementById('testQuestion').textContent = `Переведите слово: ${word}`;
+  document.getElementById('testAnswer').value = '';
+  document.getElementById('testResult').textContent = '';
+  document.getElementById('testAnswer').dataset.correct = isEn ? q.ru : q.en;
+}
+
+document.getElementById('submitAnswer').onclick = () => {
+  const answer = document.getElementById('testAnswer').value.trim().toLowerCase();
+  const correct = document.getElementById('testAnswer').dataset.correct;
+  if (answer === correct) {
+    document.getElementById('testResult').textContent = 'Правильно!';
+    currentTestIndex++;
+    if (currentTestIndex >= testQuestions.length) {
+      alert('Тест пройден! Можно начать заново.');
+      document.getElementById('testSection').style.display = 'none';
+    } else {
+      showQuestion();
+    }
+  } else {
+    document.getElementById('testResult').textContent = 'Неправильно, попробуйте снова.';
+  }
+};
+
+document.getElementById('startTestBtn').onclick = () => {
+  startTest();
+};
+
+// Изначально грузим словарь
+loadDictionary();
+displayDictionary();
+updateAutocomplete();
+</script>
+</body>
+</html>
